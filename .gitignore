@@ -11,3 +11,11 @@
 *.log
 
 !gradle-wrapper.jar
+
+bin/
+src/main/java/
+src/main/resources/onvif
+src/main/resources/oasis-open
+src/main/resources/w3
+
+.idea
