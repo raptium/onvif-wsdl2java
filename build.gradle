@@ -11,15 +11,19 @@ repositories {
 version = "1.0.0-SNAPSHOT"
 
 wsdl2java {
-    generatedWsdlDir = file("$projectDir/src/main/java")
+    generatedWsdlDir = file("$projectDir/build/generated-sources/wsdl2java")
     wsdlDir = file("$projectDir/src/main/resources/onvif")
     wsdlsToGenerate = []
 
     def files = fileTree("src/main/resources/onvif").include("**/*.wsdl")
     files.each {
-        wsdlsToGenerate << ["-xjc", "-catalog", "$projectDir/src/main/resources/xml-catalog.xml", "-autoNameResolution", "-verbose", it]
+        wsdlsToGenerate << ["-server", "-client", "-catalog", "$projectDir/src/main/resources/xml-catalog.xml", "-autoNameResolution", "-verbose", it]
     }
 }
+
+wsdl2javaTask.dependsOn("downloadWsdls")
+
+sourceSets.main.java.srcDir("$projectDir/build/generated-sources/wsdl2java")
 
 ext {
     wsdls = [
