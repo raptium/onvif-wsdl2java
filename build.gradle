@@ -21,8 +21,6 @@ wsdl2java {
     }
 }
 
-wsdl2javaTask.dependsOn("downloadWsdls")
-
 sourceSets.main.java.srcDir("$projectDir/build/generated-sources/wsdl2java")
 
 ext {
