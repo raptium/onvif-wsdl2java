@@ -1,6 +1,7 @@
 plugins {
     id "de.undercouch.download" version "5.1.0"
-    id "com.yupzip.wsdl2java" version "2.3.1"
+    id "com.yupzip.wsdl2java" version "3.0.0"
+    id "java-library"
     id "maven-publish"
 }
 
@@ -8,7 +9,7 @@ repositories {
     mavenCentral()
 }
 
-version = "1.0.0-SNAPSHOT"
+version = "1.1.0-SNAPSHOT"
 
 wsdl2java {
     generatedWsdlDir = file("$projectDir/build/generated-sources/wsdl2java")
@@ -17,15 +18,26 @@ wsdl2java {
 
     def files = fileTree("src/main/resources/onvif").include("**/*.wsdl")
     files.each {
-        wsdlsToGenerate << ["-server", "-client", "-catalog", "$projectDir/src/main/resources/xml-catalog.xml", "-autoNameResolution", "-verbose", it]
+        wsdlsToGenerate << ["-server", "-client",
+                            "-catalog", "$projectDir/src/main/resources/xml-catalog.xml",
+                            "-autoNameResolution", "-verbose",
+                            it]
     }
+
+    cxfVersion = "4.0.2"
+    cxfPluginVersion = "4.0.0"
+}
+
+dependencies {
+    api "jakarta.xml.ws:jakarta.xml.ws-api:4.0.0"
+    api "jakarta.xml.bind:jakarta.xml.bind-api:4.0.0"
 }
 
 sourceSets.main.java.srcDir("$projectDir/build/generated-sources/wsdl2java")
 
 ext {
     wsdls = [
-            "$projectDir/src/main/resources/onvif"     : [
+            "$projectDir/src/main/resources/onvif": [
                     "https://www.onvif.org/ver10/actionengine.wsdl",
                     "https://www.onvif.org/ver10/advancedsecurity/wsdl/advancedsecurity.wsdl",
                     "https://www.onvif.org/ver10/analyticsdevice.wsdl",
@@ -79,7 +91,7 @@ ext {
     ]
 }
 
-task downloadWsdls {
+tasks.register('downloadWsdls') {
     doLast {
         wsdls.each { destinationDirectory, sourceFiles ->
             sourceFiles.each { sourceFile ->
@@ -98,7 +110,7 @@ task downloadWsdls {
     }
 }
 
-task deleteFiles(type: Delete) {
+tasks.register('deleteFiles', Delete) {
     delete wsdl2java.generatedWsdlDir, wsdls.keySet()
 }
 
